@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Helpers;
 using MartinCostello.Models.Identity;
 using Microsoft.AspNet.Identity;
@@ -72,10 +73,10 @@ namespace MartinCostello
         /// </summary>
         internal static void ConfigureAntiForgery()
         {
-            AntiForgeryConfig.CookieName = "martincostelloxsrf";            // Match the naming scheme used for other cookies
-            AntiForgeryConfig.RequireSsl = true;                            // The site should only ever run over HTTPS
-            AntiForgeryConfig.SuppressXFrameOptionsHeader = true;           // We already specify this in Web.config
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;  // Tell anti-forgery to use the name claim
+            AntiForgeryConfig.CookieName = "martincostelloxsrf";                    // Match the naming scheme used for other cookies
+            AntiForgeryConfig.RequireSsl = !HttpContext.Current.IsDebuggingEnabled; // The site should only ever run over HTTPS
+            AntiForgeryConfig.SuppressXFrameOptionsHeader = true;                   // We already specify this in Web.config
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;          // Tell anti-forgery to use the name claim
         }
 
         /// <summary>
