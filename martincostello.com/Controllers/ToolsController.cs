@@ -17,6 +17,7 @@ using System.Text;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using log4net;
 using MartinCostello.Models;
 
 namespace MartinCostello.Controllers
@@ -26,6 +27,11 @@ namespace MartinCostello.Controllers
     /// </summary>
     public class ToolsController : Controller
     {
+        /// <summary>
+        /// The <see cref="ILog"/> to use. This field is read-only.
+        /// </summary>
+        private static readonly ILog ToolsLogger = LogManager.GetLogger(typeof(ToolsController));
+
         /// <summary>
         /// An <see cref="IDictionary{K, V}"/> containing the sizes of the decryption and validation hashes for machine keys.
         /// </summary>
@@ -78,6 +84,7 @@ namespace MartinCostello.Controllers
         [ActionName("_GenerateGuid")]
         public ActionResult GenerateGuid(string format, bool uppercase)
         {
+            ToolsLogger.Info("Generating a new GUID.");
             ValidateAntiForgeryTokenAjax();
 
             string data = Guid.NewGuid().ToString(format ?? "D", CultureInfo.InvariantCulture);
@@ -128,6 +135,7 @@ namespace MartinCostello.Controllers
             Justification = "It is not disposed multiple times.")]
         public ActionResult GenerateHash(GenerateHashModel model)
         {
+            ToolsLogger.Info("Generating a new hash.");
             ValidateAntiForgeryTokenAjax();
 
             if (model == null)
@@ -208,6 +216,7 @@ namespace MartinCostello.Controllers
         [ActionName("_GenerateMachineKey")]
         public ActionResult GenerateMachineKey(GenerateMachineKeyModel model)
         {
+            ToolsLogger.Info("Generating a new machine key.");
             ValidateAntiForgeryTokenAjax();
 
             if (model == null)
