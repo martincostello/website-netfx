@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Browsers>
+  <Browser>
+    <BrowserType>Firefox</BrowserType>
+  </Browser>
+  <Browser>
+    <BrowserType>Chrome</BrowserType>
+  </Browser>
+</Browsers>

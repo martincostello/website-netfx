@@ -1,0 +1,48 @@
+﻿@model GenerateMachineKeyModel
+<form class="form-horizontal" id="form-generate-machine-key" role="form">
+    <fieldset>
+        <legend>Machine Key Generator</legend>
+        <a name="GenerateMachineKey"></a>
+        <div class="form-group">
+            @Html.LabelFor((m) => m.DecryptionAlgorithmName, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.DropDownListFor(
+                    (m) => m.DecryptionAlgorithmName,
+                    new SelectList(this.Model.DecryptionAlgorithms, "Value", "Text", this.Model.DecryptionAlgorithmName),
+                    "-- Select decryption algorithm --",
+                    new { @class = "form-control", id = "dropdown-decryption" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor((m) => m.ValidationAlgorithmName, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.DropDownListFor(
+                    (m) => m.ValidationAlgorithmName,
+                    new SelectList(this.Model.ValidationAlgorithms, "Value", "Text", this.Model.ValidationAlgorithmName),
+                    "-- Select validation algorithm --",
+                    new { @class = "form-control", id = "dropdown-validation" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-8">
+                <a id="button-generate-machine-key" class="btn btn-primary" href="#GenerateMachineKey" role="button" rel="nofollow" onclick="_gaq.push(['_trackEvent', 'generate-machine-key', 'clicked'])">Generate Machine Key</a>
+            </div>
+        </div>
+        <div id="div-machine-key" class="form-group hidden">
+            <label for="code-machine-key" class="control-label col-md-2">Configuration Element</label>
+            <div class="col-md-7">
+                <p id="code-machine-key" class="code code-preserve-whitespace"></p>
+            </div>
+        </div>
+        @if (!this.Request.Browser.IsMobileDevice)
+        {
+        <div id="div-machine-key-copy" class="form-group hidden">
+            <div class="col-md-offset-2 col-md-8">
+                <a id="link-copy-machine-key" href="#" rel="nofollow" class="btn btn-default copy-button" data-clipboard-target="code-machine-key" title="Copy to clipboard">
+                    Copy to clipboard <span class="glyphicon glyphicon-save"></span>
+                </a>
+            </div>
+        </div>
+        }
+    </fieldset>
+</form>

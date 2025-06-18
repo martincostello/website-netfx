@@ -1,0 +1,59 @@
+﻿@model GenerateGuidModel
+<form class="form-horizontal" id="form-generate-guid" role="form">
+    <fieldset>
+        <legend>GUID Generator</legend>
+        <a name="GenerateGuid"></a>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-7">
+                @{
+                    string format = "D";
+                    bool uppercase = false;
+                    
+                    if (this.Model != null)
+                    {
+                        format = this.Model.Format;
+                        uppercase = this.Model.Uppercase;
+                    }
+                }
+                @if (this.Request.Browser.IsMobileDevice)
+                {
+                @Html.TextBox("text-guid", @Guid.NewGuid().ToString(format, CultureInfo.InvariantCulture), new { @class = "form-control code", id = "text-guid", disabled = string.Empty })
+                }
+                else
+                {
+                <div class="input-group">
+                    @Html.TextBox("text-guid", @Guid.NewGuid().ToString(format, CultureInfo.InvariantCulture), new { @class = "form-control code", id = "text-guid", disabled = string.Empty })
+                    <span class="input-group-btn">
+                        <button id="button-copy-guid" class="btn btn-default copy-button" data-clipboard-target="text-guid" title="Copy to clipboard">
+                            <span class="glyphicon glyphicon-save"></span>
+                        </button>
+                    </span>
+                </div>
+                }
+            </div>
+            <div class="col-md-2">
+                <a id="button-generate-guid" class="btn btn-primary" role="button" href="#GenerateGuid" rel="nofollow" onclick="_gaq.push(['_trackEvent', 'generate-guid', 'clicked'])">New GUID</a>
+            </div>
+        </div>
+        @if (this.Model != null)
+        {
+        <div class="form-group">
+            @Html.LabelFor((m) => m.Format, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.DropDownListFor(
+                (m) => m.Format,
+                new SelectList(this.Model.Formats, "Value", "Text", format),
+                "-- Select format --",
+                new { @class = "form-control", id = "dropdown-guid-format" })
+            </div>
+        </div>
+        }
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-7">
+                <div class="checkbox">
+                    <label><input id="checkbox-guid-uppercase" type="checkbox" value="@uppercase">&nbsp;Upper case?</label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>

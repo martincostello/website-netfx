@@ -1,0 +1,130 @@
+﻿@{
+    ViewBag.Title = "Maps";
+    ViewBag.MetaDescription = string.Empty;
+    ViewBag.MetaRobots = "NOINDEX";
+}
+<h2>@ViewBag.Title</h2>
+<div>
+    <div id="googleMap" style="width:800px;height:600px;max-width:90%;max-height:90%;margin: 0 auto;"></div>
+</div>
+@section scripts {
+    <script>
+    window.onload = function () {
+        var script = document.createElement("script");
+        script.async = true;
+        script.src = "https://maps.googleapis.com/maps/api/js?key=@(MvcApplication.GoogleApiKey)&sensor=true&callback=initializeGoogleMaps&language=@UICulture";
+        script.type = "text/javascript";
+        document.body.appendChild(script);
+    };
+
+    function initializeGoogleMaps() {
+
+        @* Default location if GeoLocation fails, is not supported or is denied *@
+        var pinLocation = new google.maps.LatLng(51.508742, -0.120850);
+
+        var mapOptions = {
+            center: pinLocation,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+            panControl: true,
+            scaleControl: true,
+            zoom: 15,
+            zoomControl: true,
+        };
+
+        var map = new google.maps.Map(
+            document.getElementById("googleMap"),
+            mapOptions);
+
+        var infoWindow = new google.maps.InfoWindow({
+            content: "This is not where you are.",
+            position: pinLocation,
+            title: "Not Your Location",
+        });
+
+        var marker = new google.maps.Marker({
+            animation: google.maps.Animation.DROP,
+            draggable: true,
+            map: map,
+            position: pinLocation,
+            title: "Not your location",
+        });
+
+        var infoWindow;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    pinLocation = new google.maps.LatLng(
+                        position.coords.latitude,
+                        position.coords.longitude);
+
+                    infoWindow = new google.maps.InfoWindow({
+                        content: "This is where you are.",
+                        position: pinLocation,
+                        title: "Your Location",
+                    });
+
+                    marker.setPosition(pinLocation);
+                    marker.setTitle("Your location");
+
+                    map.setCenter(pinLocation);
+
+                        @*var geocoder = new google.maps.Geocoder();
+                        geocoder.geocode({
+                                "latLng": pinLocation,
+                            },
+                            function (results, status) {
+                                if (status == google.maps.GeocoderStatus.OK) {
+                                    if (results[results.length - 1]) {
+                                        var countryInfo = results[results.length - 1];
+                                        infoWindow.setContent(countryInfo.formatted_address + " (" + countryInfo.address_components[0].short_name + ")");
+                                        infoWindow.open(map, marker);
+                                    }
+                                }
+                            });*@
+                    },
+                    geolocationError);
+            }
+
+            google.maps.event.addListener(marker, 'click', function () {
+                if (infoWindow) {
+                    infoWindow.open(map, marker);
+                }
+            });
+
+            function geolocationError(error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                    case error.POSITION_UNAVAILABLE:
+                    case error.TIMEOUT:
+                    case error.UNKNOWN_ERROR:
+                        break;
+                }
+            }
+
+            @*if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        var coordinates = new google.maps.LatLng(
+                            position.coords.latitude,
+                            position.coords.longitude);
+
+                        new google.maps.Geocoder().geocode({
+                                latLng: coordinates,
+                                //key: "@MvcApplication.GoogleApiKey",
+                                language: "@UICulture",
+                                //result_type: "country",
+                            },
+                            function (results, status) {
+                                if (status == google.maps.GeocoderStatus.OK) {
+                                    if (results[results.length - 1]) {
+                                        var countryInfo = results[results.length - 1];
+                                        alert(countryInfo.formatted_address + " (" + countryInfo.address_components[0].short_name + ")");
+                                    }
+                                }
+                            });
+                });
+            }*@
+        }
+    </script>
+}

@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34902.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "martincostello.com", "martincostello.com\martincostello.com.csproj", "{946E3E5E-3FFC-4739-9D70-C2ED93461057}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{376A3474-81E2-4BA9-8D48-F579C34CC621}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.config = .nuget\NuGet.config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{46CC5054-BD05-43DC-ADE6-5FCB8F8303FC}"
+	ProjectSection(SolutionItems) = preProject
+		Build.cmd = Build.cmd
+		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		FxCopDictionary.xml = FxCopDictionary.xml
+		martincostello.com.msbuild = martincostello.com.msbuild
+		martincostello.com.ruleset = martincostello.com.ruleset
+		martincostello.com.runsettings = martincostello.com.runsettings
+		martincostello.com.snk = martincostello.com.snk
+		martincostello.com.targets = martincostello.com.targets
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "martincostello.com.Tests", "martincostello.com.Tests\martincostello.com.Tests.csproj", "{FE0414CE-9B71-45E7-9EC1-B55D9A2FC7E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{946E3E5E-3FFC-4739-9D70-C2ED93461057}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{946E3E5E-3FFC-4739-9D70-C2ED93461057}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{946E3E5E-3FFC-4739-9D70-C2ED93461057}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{946E3E5E-3FFC-4739-9D70-C2ED93461057}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE0414CE-9B71-45E7-9EC1-B55D9A2FC7E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE0414CE-9B71-45E7-9EC1-B55D9A2FC7E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE0414CE-9B71-45E7-9EC1-B55D9A2FC7E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE0414CE-9B71-45E7-9EC1-B55D9A2FC7E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://martincostello.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = martincostello.com\\martincostello.com.csproj
+		SccProjectName1 = martincostello.com
+		SccLocalPath1 = martincostello.com
+		SccProjectUniqueName2 = martincostello.com.Tests\\martincostello.com.Tests.csproj
+		SccProjectName2 = martincostello.com.Tests
+		SccLocalPath2 = martincostello.com.Tests
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="17.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+		<PlatformToolset>v120</PlatformToolset>
+		<OutDir>$(MSBuildProjectDirectory)\BuildOutput\</OutDir>
+		<SolutionFile>martincostello.com.sln</SolutionFile>
+		<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildThisFileDirectory)</SolutionDir>
+		<RunTests Condition="'$(RunTests)' == ''">true</RunTests>
+		<RunIntegrationTests Condition="'$(RunIntegrationTests)' == ''">false</RunIntegrationTests>
+		<RunUITests Condition="'$(RunUITests)' == ''">false</RunUITests>
+		<CodeAnalysisTreatWarningsAsErrors Condition="'$(CodeAnalysisTreatWarningsAsErrors)' == ''">true</CodeAnalysisTreatWarningsAsErrors>
+		<SourceAnalysisTreatErrorsAsWarnings Condition="'$(SourceAnalysisTreatErrorsAsWarnings)' == ''">false</SourceAnalysisTreatErrorsAsWarnings>
+		<TreatWarningsAsErrors Condition="'$(TreatWarningsAsErrors)' == ''">true</TreatWarningsAsErrors>
+		<CodeTaskFactoryAssembly>$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll</CodeTaskFactoryAssembly>
+		<TfsBuild Condition=" '$(TF_BUILD)' == 'True'">true</TfsBuild>
+	</PropertyGroup>
+	<PropertyGroup>
+		<BuildProperties>Configuration=$(Configuration);CodeAnalysisTreatWarningsAsErrors=$(CodeAnalysisTreatWarningsAsErrors);SourceAnalysisTreatErrorsAsWarnings=$(SourceAnalysisTreatErrorsAsWarnings);TreatWarningsAsErrors=$(TreatWarningsAsErrors)</BuildProperties>
+	</PropertyGroup>
+	<Target Name="Clean">
+		<MSBuild Projects="$(SolutionFile)" Targets="Clean" Properties="$(BuildProperties);OutDir=$(OutDir)"/>
+	</Target>
+	<Target Name="Build" DependsOnTargets="UpdateAssemblyInfo;RestorePackages">
+		<MSBuild Projects="$(SolutionFile)" Targets="Build" Properties="$(BuildProperties);OutDir=$(OutDir)"/>
+	</Target>
+	<Target Name="Rebuild" DependsOnTargets="UpdateAssemblyInfo;RestorePackages">
+		<MSBuild Projects="$(SolutionFile)" Targets="Rebuild" Properties="$(BuildProperties);OutDir=$(OutDir)"/>
+	</Target>
+	<Target Name="AfterBuild" AfterTargets="Build;Rebuild">
+		<CallTarget Targets="Test" Condition="'$(RunTests)' == 'true' and '$(TfsBuild)' == ''" />
+	</Target>
+	<Target Name="Test">
+		<ItemGroup>
+			<TestContainer Include="$(OutDir)\*tests*.dll" />
+		</ItemGroup>
+		<IsCurrentUserAdmin>
+			<Output PropertyName="_IsCurrentUserAdmin" TaskParameter="IsAdmin" />
+		</IsCurrentUserAdmin>
+		<PropertyGroup Condition="'$(TestSettingsTestCaseFilter)' == ''">
+			<TestCaseFilter>"/TestCaseFilter:</TestCaseFilter>
+			<TestCaseFilter Condition="!$(_IsCurrentUserAdmin)">$(TestCaseFilter)TestCategory!="RequiresAdministrativePermissions"&amp;</TestCaseFilter>
+			<TestCaseFilter Condition="'$(RunIntegrationTests)' != 'true'">$(TestCaseFilter)TestCategory!="Integration"&amp;</TestCaseFilter>
+			<TestCaseFilter Condition="'$(RunUITests)' != 'true'">$(TestCaseFilter)TestCategory!="UI"&amp;</TestCaseFilter>
+			<TestCaseFilter>$(TestCaseFilter.TrimEnd('&amp;'))</TestCaseFilter>
+		</PropertyGroup>
+		<PropertyGroup>
+			<TestToolDir>$(ProgramW6432)\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow</TestToolDir>
+			<TestToolName>vstest.console.exe</TestToolName>
+			<TestSettings Condition="'$(TestSettings)' == ''">$(SolutionDir)Local.runsettings</TestSettings>
+			<_UseTrxLogger Condition="'$(UseTrxLogger)' == 'true'">/logger:Trx</_UseTrxLogger>
+		</PropertyGroup>
+		<Warning Condition=" '@(TestContainer)' == '' " Text="No test assemblies could be found." />
+		<Exec Condition=" '@(TestContainer)' != '' " Command="%22$(TestToolDir)\$(TestToolName)%22 @(TestContainer->'%22%(fullpath)%22', ' ') %22/Settings:$(TestSettings)%22 /InIsolation $(_UseTrxLogger) $(TestCaseFilter)" WorkingDirectory="$(OutDir)" />
+	</Target>
+	<Target Name="RestorePackages" DependsOnTargets="CheckForNuGetPackageConflicts">
+		<PropertyGroup>
+			<NuGetToolsPath>$([System.IO.Path]::Combine($(SolutionDir), "Tools"))</NuGetToolsPath>
+			<NuGetExePath>$(NuGetToolsPath)\nuget.exe</NuGetExePath>
+			<RequireRestoreConsent>false</RequireRestoreConsent>
+		</PropertyGroup>
+		<Message Text="Restoring NuGet packages..." Importance="normal" />
+		<Exec Command="%22$(NuGetExePath)%22 restore %22$(SolutionFile)%22" LogStandardErrorAsError="true" />
+	</Target>
+	<Target Name="UpdateAssemblyInfo" Condition="'$(TfsBuild)' == 'true'">
+		<PropertyGroup>
+			<VersionFile>$(SolutionDir)CommonAssemblyInfo.cs</VersionFile>
+			<_BuildDefinition>$(BuildDefinition)</_BuildDefinition>
+			<_BuildDefinition Condition="'$(_BuildDefinition)' == ''">$(BUILD_DEFINITIONNAME)</_BuildDefinition>
+			<_BuildNumber>$(BuildLabel)</_BuildNumber>
+			<_BuildNumber Condition="'$(_BuildNumber)' == ''">$(BUILD_BUILDNUMBER)</_BuildNumber>
+			<_Changeset>$(BuildSourceVersion)</_Changeset>
+			<_Changeset Condition="'$(_Changeset)' == ''">$(BUILD_SOURCEVERSION)</_Changeset>
+		</PropertyGroup>
+		<Exec Command="attrib -R %22$(VersionFile)%22" />
+		<UpdateAssemblyInfo AssemblyInfoPath="$(VersionFile)"
+							BuildDefinition="$(_BuildDefinition)"
+							BuildNumber="$(_BuildNumber)"
+							Changeset="$(_Changeset)" />
+	</Target>
+	<UsingTask TaskName="UpdateAssemblyInfo"
+			   TaskFactory="CodeTaskFactory"
+			   AssemblyFile="$(CodeTaskFactoryAssembly)" >
+		<ParameterGroup>
+			<AssemblyInfoPath Required="true" />
+			<BuildDefinition Required="true" />
+			<BuildNumber Required="true" />
+			<Changeset Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.IO"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+        DateTime now = DateTime.UtcNow;
+        string build = ((int)Math.Floor((now - new DateTime(2012, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalDays) + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string buildDate = now.ToString("u", System.Globalization.CultureInfo.InvariantCulture);
+        string revision = (BuildNumber.Substring(BuildNumber.LastIndexOf(".", StringComparison.Ordinal) + 1)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+        
+        string content = File.ReadAllText(AssemblyInfoPath);
+        content = content.Replace("[assembly: AssemblyCopyright(\"Copyright � Martin Costello, 2014-2015. All rights reserved.\")]", "[assembly: AssemblyCopyright(\"Copyright � Martin Costello, 2014-" + now.Year.ToString(System.Globalization.CultureInfo.InvariantCulture) + ". All rights reserved.\")]");
+        content = content.Replace("[assembly: AssemblyConfiguration(\"\")]", "[assembly: AssemblyConfiguration(\"" + BuildNumber + "|" + Changeset.TrimStart('C') + "|" + buildDate + "\")]");
+        content = content.Replace("[assembly: AssemblyFileVersion(\"1.0.0.0\")]", "[assembly: AssemblyFileVersion(\"1.0." + build + "." + revision + "\")]");
+        content = content.Replace("[assembly: AssemblyInformationalVersion(\"1.0.0.0\")]", "[assembly: AssemblyInformationalVersion(\"1.0." + build + "." + revision + "\")]");
+        
+        content += Environment.NewLine + "[assembly: AssemblyMetadata(\"BuildLabel\", \"" + BuildDefinition + "_" + BuildNumber + "\")]";
+        content += Environment.NewLine + "[assembly: AssemblyMetadata(\"BuildTimestamp\", \"" + now.ToString("r", System.Globalization.CultureInfo.InvariantCulture) + "\")]";
+        content += Environment.NewLine;
+        File.WriteAllText(AssemblyInfoPath, content);
+      ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	<UsingTask TaskName="IsCurrentUserAdmin"
+			   TaskFactory="CodeTaskFactory"
+			   AssemblyFile="$(CodeTaskFactoryAssembly)" >
+		<ParameterGroup>
+			<IsAdmin ParameterType="System.Boolean" Output="true" />
+		</ParameterGroup>
+		<Task>
+			<Using Namespace="System.Security.Principal"/>
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+        using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+        {
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            IsAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+      ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+	<Target Name="CheckForNuGetPackageConflicts">
+		<CheckForNuGetPackageConflicts SolutionDir="$(SolutionDir)" />
+	</Target>
+	<UsingTask TaskName="CheckForNuGetPackageConflicts"
+			   TaskFactory="CodeTaskFactory"
+			   AssemblyFile="$(CodeTaskFactoryAssembly)" >
+		<ParameterGroup>
+			<SolutionDir Required="true" />
+		</ParameterGroup>
+		<Task>
+			<Reference Include="System.Xml" />
+			<Using Namespace="System.Collections.Generic" />
+			<Using Namespace="System.IO" />
+			<Using Namespace="System.Linq" />
+			<Using Namespace="System.Text" />
+			<Using Namespace="System.Xml" />
+			<Code Type="Fragment" Language="cs">
+				<![CDATA[
+        var packageIdentities = new List<string>();
+
+        var packageConfigs = new string[]
+        {
+            Path.Combine(SolutionDir, @"martincostello.com\packages.config"),
+            Path.Combine(SolutionDir, @"martincostello.com.Tests\packages.config"),
+        };
+
+        foreach (string path in packageConfigs)
+        {
+            var document = new XmlDocument();
+            document.Load(path);
+
+            foreach (XmlNode node in document.SelectNodes("/packages/package"))
+            {
+                var id = string.Join(";", node.Attributes["id"].Value, node.Attributes["version"].Value, path);
+
+                if (!packageIdentities.Contains(id))
+                {
+                    packageIdentities.Add(id);
+                }
+            }
+        }
+
+        packageIdentities.Sort();
+
+        var duplicatePackageNames = new Dictionary<string, ICollection<Tuple<string, string>>>();
+
+        var packages = packageIdentities
+            .Select((p) => p.Split(';'))
+            .Select((p) => new { Id = p[0], Version = p[1], Path = p[2] })
+            .GroupBy((p) => p.Id);
+
+        foreach (var package in packages)
+        {
+            int versions = package
+                .Select((p) => p.Version)
+                .Distinct()
+                .Count();
+
+            if (versions > 1)
+            {
+                IList<Tuple<string, string>> conflicts = new List<Tuple<string, string>>();
+
+                foreach (var version in package)
+                {
+                    conflicts.Add(Tuple.Create(version.Version, version.Path.Replace(SolutionDir, "")));
+                }
+
+                duplicatePackageNames[package.Key] = conflicts;
+            }
+        }
+
+        foreach (var package in duplicatePackageNames)
+        {
+            var builder = new StringBuilder();
+            builder.AppendFormat("More than one version of the {0} NuGet package is referenced:", package.Key);
+
+            foreach (var version in package.Value.OrderBy((p) => p.Item1))
+            {
+                builder.AppendFormat("\n{0} in '{1}';", version.Item1, version.Item2);
+            }
+
+            builder.Length--;
+            builder.Append(".");
+
+            Log.LogError(builder.ToString());
+        }
+      ]]>
+			</Code>
+		</Task>
+	</UsingTask>
+</Project>

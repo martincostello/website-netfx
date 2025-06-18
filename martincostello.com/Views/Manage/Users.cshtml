@@ -1,0 +1,53 @@
+﻿@using MartinCostello.Models.Identity;
+@model ICollection<ApplicationUser>
+@{
+    ViewBag.Title = "Manage Users";
+    ViewBag.MetaDescription = string.Empty;
+    ViewBag.MetaRobots = "NOINDEX";
+}
+<h1>Manage Users</h1>
+<div class="container-fluid">
+    <div class="table-responsive">
+        <table class="table table-bordered table-condensed table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Role(s)</th>
+                    <th>Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (ApplicationUser user in this.Model)
+                {
+                    <tr>
+                        <td><a href="mailto:@user.Email">@user.Email</a></td>
+                        <td>@string.Join(", ", user.Roles.Select((p) => p.RoleName).OrderBy((p) => p, StringComparer.OrdinalIgnoreCase))</td>
+                        @if (user.Roles.Where((p) => p.RoleName == RoleNames.Admin).Any())
+                        {
+                            <td>
+                                @if (this.User.Identity.Name != user.UserName)
+                                {
+                                    using (Html.BeginForm("RemoveRole", "Manage", new { userId = user.Id, role = RoleNames.Admin }, FormMethod.Post, null))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-primary btn-block">Revoke admin access?</button>
+                                    }
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                @using (Html.BeginForm("AddRole", "Manage", new { userId = user.Id, role = RoleNames.Admin }, FormMethod.Post, null))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-primary btn-block">Grant admin access?</button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

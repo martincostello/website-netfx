@@ -1,0 +1,7 @@
+﻿@model System.Web.Mvc.HandleErrorInfo
+@{
+    ViewBag.Title = ViewBag.Title ?? "Error";
+    ViewBag.Message = ViewBag.Message ?? this.Response.StatusDescription;
+}
+<h1 class="text-danger">Error (HTTP @this.Response.StatusCode)</h1>
+<h2 class="text-danger">@this.ViewBag.Message</h2>

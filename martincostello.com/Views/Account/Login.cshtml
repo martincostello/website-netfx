@@ -1,0 +1,59 @@
+﻿@using Microsoft.Owin.Security
+@{
+    ViewBag.Title = "Log in";
+    ViewBag.MetaDescription = string.Empty;
+    ViewBag.MetaRobots = "NOINDEX";
+}
+<h2></h2>
+<div class="row">
+    <div class="col-md-8">
+        <div class="jumbotron">
+            <h1>@ViewBag.Title</h1>
+            <p>
+                To log in click one of the third-party authentication service's buttons.
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <section id="socialLoginForm">
+            <h4>Use another service to log in.</h4>
+            <hr />
+            @{
+                var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+
+                if (!loginProviders.Any())
+                {
+                    <div>
+                        <p>No third-party authentication services are available at this time.</p>
+                    </div>
+                }
+                else
+                {
+                    using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = ViewBag.ReturnUrl }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div id="socialLoginList">
+                            <p>
+                                @{
+                                    Dictionary<string, string> iconMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                                    {
+                                        { "GitHub", "github" },
+                                        { "Google", "google" },
+                                        { "Microsoft", "windows" },
+                                        { "Twitter", "twitter" },
+                                    };
+                                }
+                                @foreach (AuthenticationDescription p in loginProviders.OrderBy((p) => p.Caption))
+                                {
+                                    <button type="submit" class="btn btn-block btn-social btn-@p.AuthenticationType.ToLowerInvariant()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">
+                                        <i class="fa fa-@iconMap[p.AuthenticationType]"></i> Log in using your @p.Caption account
+                                    </button>
+                                }
+                            </p>
+                        </div>
+                    }
+                }
+            }
+        </section>
+    </div>
+</div>

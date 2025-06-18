@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = ".NET Development Tools";
+    ViewBag.MetaDescription = ".NET Development Tools for generating GUIDs, machine keys and hashing text.";
+}
+<h1>@ViewBag.Title</h1>
+<div class="panel panel-default">
+    <div class="panel-body">This page contains tools and links to common .NET development tools.</div>
+</div>
+<div>
+    @Html.Partial("_GenerateGuid", new GenerateGuidModel("d"))
+</div>
+<div>
+    @Html.Partial("_GenerateHash", new GenerateHashModel("SHA256"))
+</div>
+<div>
+    @Html.Partial("_GenerateMachineKey", new GenerateMachineKeyModel("AES-256", "SHA1"))
+</div>
+
+@section scripts {
+@Scripts.Render("~/bundles/zeroclipboard")
+<script>
+    var copyButton = $(".copy-button");
+
+    copyButton.click(function (event) {
+        event.preventDefault();
+    });
+
+    ZeroClipboard.config({ swfPath: "/Scripts/ZeroClipboard.swf" });
+    var client = new ZeroClipboard(copyButton);
+
+    $(document).ready(function () {
+        var generateNewGuid = function () {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("_GenerateGuid", "Tools")",
+                dataType: "html",
+                data: {
+                    "format": $('#dropdown-guid-format').val(),
+                    "upperCase": $('#checkbox-guid-uppercase').prop('checked'),
+                },
+                headers: {
+                    "@SecurityHelpers.AjaxAntiForgeryTokenName": "@SecurityHelpers.CreateTokenHeaderValue()"
+                },
+                success: function (result) {
+                    $('#text-guid').val(jQuery.parseJSON(result).guid);
+                }
+            });
+        };
+        $('#button-generate-guid').click(function () {
+            generateNewGuid();
+        });
+        $('#checkbox-guid-uppercase').change(function () {
+            generateNewGuid();
+        });
+        $('#dropdown-guid-format').change(function () {
+            generateNewGuid();
+        });
+        var generateHash = function () {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("_GenerateHash", "Tools")",
+                dataType: "html",
+                data: {
+                    "format": $('#dropdown-hash-format').val(),
+                    "hashName": $('#dropdown-hash-name').val(),
+                    "plaintext": $('#textarea-plaintext').val(),
+                },
+                headers: {
+                    "@SecurityHelpers.AjaxAntiForgeryTokenName": "@SecurityHelpers.CreateTokenHeaderValue()"
+                },
+                success: function (result) {
+                    $('#text-hash').val(jQuery.parseJSON(result).hash);
+                    $("#div-hash").removeClass('hidden');
+                }
+            });
+        };
+        $('#button-generate-hash').click(function () {
+            generateHash();
+        });
+        var generateMachineKey = function () {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("_GenerateMachineKey", "Tools")",
+                dataType: "html",
+                data: {
+                    "decryptionAlgorithmName": $('#dropdown-decryption').val(),
+                    "validationAlgorithmName": $('#dropdown-validation').val(),
+                },
+                headers: {
+                    "@SecurityHelpers.AjaxAntiForgeryTokenName": "@SecurityHelpers.CreateTokenHeaderValue()"
+                },
+                success: function (result) {
+                    var json = jQuery.parseJSON(result);
+                    $('#code-machine-key').text(json.tag);
+                    $("#div-machine-key").removeClass('hidden');
+                    @if (!this.Request.Browser.IsMobileDevice)
+                    {
+                    <text>$("#div-machine-key-copy").removeClass('hidden');</text>
+                    }
+                }
+            });
+        };
+        $('#button-generate-machine-key').click(function () {
+            generateMachineKey();
+        });
+    });
+</script>
+}

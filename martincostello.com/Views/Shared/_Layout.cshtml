@@ -1,0 +1,174 @@
+﻿@using Microsoft.Owin.Security
+<!DOCTYPE html>
+<html lang="en-gb">
+<head>
+    @{
+        string siteName = "Personal Website of Martin Costello";
+        string description = ViewBag.MetaDescription ?? siteName;
+        string image = ViewBag.MetaImage ?? string.Empty;
+        string imageAltText = ViewBag.MetaImageAltText ?? string.Empty;
+        string robots = ViewBag.MetaRobots ?? "INDEX";
+        string title = ViewBag.Title + " - martincostello.com";
+        string twitterHandle = "@martin_costello";
+
+        UriBuilder builder = new UriBuilder(Context.Request.Url);
+        builder.Query = string.Empty;
+
+        string canonicalUri = builder.Uri.AbsoluteUri.ToLowerInvariant();
+        
+        if (!canonicalUri.EndsWith("/"))
+        {
+            canonicalUri += "/";
+        }
+        
+        if (!string.IsNullOrEmpty(image))
+        {
+            builder.Path = image;
+            image = builder.Uri.AbsoluteUri;
+        }
+    }
+    <title>@title</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="cache-control" content="no-cache, no-store" />
+    <meta http-equiv="content-type" content="text/html;" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="author" content="Martin Costello" />
+    <meta name="copyright" content="&copy; Martin Costello 2014-@DateTime.UtcNow.Date.Year" />
+    <meta name="description" content="@description" />
+    <meta name="language" content="en" />
+    <meta name="keywords" content="martin,costello" />
+    <meta name="robots" content="@robots" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, maximum-scale=1" />
+    <meta property="fb:profile_id" content="10100867762061905" />
+    <meta name="application-name" content="martincostello.com" />
+    <meta name="msapplication-config" content="browserconfig.xml" />
+    <meta name="msapplication-navbutton-color" content="#0095DA" />
+    <meta name="msapplication-starturl" content="/" />
+    <meta name="msapplication-TileColor" content="#2d89ef" />
+    <meta name="msapplication-TileImage" content="@Url.Content("~/mstile-144x144.png?v=477XzzYNy7")" />
+    <meta property="og:description" content="@description" />
+    @if (!string.IsNullOrEmpty(image))
+    {
+        <meta property="og:image" content="@image" />
+        <meta name="twitter:image" content="@image" />
+        if (!string.IsNullOrWhiteSpace(imageAltText))
+        {
+            <meta name="twitter:image:alt" content="@imageAltText" />
+        }
+    }
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content="@siteName" />
+    <meta property="og:title" content="@ViewBag.Title" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@canonicalUri" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@twitterHandle" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:domain" content="@builder.Host" />
+    <meta name="twitter:site" content="@twitterHandle" />
+    <meta name="twitter:title" content="@title" />
+    <meta name="twitter:url" content="@canonicalUri" />
+    <meta name="google-site-verification" content="ji6SNsPQEbNQmF252sQgQFswh-b6cDnNOa3AHvgo4J0" />
+    @RenderSection("metaTags", required: false)
+    <link rel="canonical" href="@canonicalUri" />
+    <link rel="manifest" href="@Url.Content("~/manifest.json?v=477XzzYNy7")" />
+    <link rel="sitemap" type="application/xml" href="@Url.Content("~/sitemap.xml")" />
+    <link rel="shortcut icon" type="image/x-icon" href="@Url.Content("~/favicon.ico?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="57x57" href="@Url.Content("~/apple-touch-icon-57x57.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="60x60" href="@Url.Content("~/apple-touch-icon-60x60.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="72x72" href="@Url.Content("~/apple-touch-icon-72x72.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="76x76" href="@Url.Content("~/apple-touch-icon-76x76.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="114x114" href="@Url.Content("~/apple-touch-icon-114x114.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="120x120" href="@Url.Content("~/apple-touch-icon-120x120.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="144x144" href="@Url.Content("~/apple-touch-icon-144x144.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="152x152" href="@Url.Content("~/apple-touch-icon-152x152.png?v=477XzzYNy7")" />
+    <link rel="apple-touch-icon" sizes="180x180" href="@Url.Content("~/apple-touch-icon-180x180.png?v=477XzzYNy7")" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/android-chrome-192x192.png?v=477XzzYNy7")" sizes="192x192" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/favicon-32x32.png?v=477XzzYNy7")" sizes="32x32" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/favicon-96x96.png?v=477XzzYNy7")" sizes="96x96" />
+    <link rel="icon" type="image/png" href="@Url.Content("~/favicon-16x16.png?v=477XzzYNy7")" sizes="16x16" />
+    @RenderSection("linkTags", required: false)
+    @Styles.RenderFormat("<link href=\"{0}\" rel=\"prefetch\"/>", "~/Content/css")
+    @Scripts.RenderFormat("<link href=\"{0}\" rel=\"prefetch\"/>", "~/bundles/modernizr")
+    @Scripts.RenderFormat("<link href=\"{0}\" rel=\"prefetch\"/>", "~/bundles/jquery")
+    @Scripts.RenderFormat("<link href=\"{0}\" rel=\"prefetch\"/>", "~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
+    @RenderSection("styles", required: false)
+    <script type="text/javascript">
+        if (self == top) {
+            document.documentElement.className = document.documentElement.className.replace(/\bjs-flash\b/, '');
+        }
+        else {
+            top.location = self.location;
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("martincostello.com", "Index", "Home", null, new { @class = "navbar-brand", id = "link-home" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Projects", "Index", "Projects", null, new { id = "link-projects" })</li>
+                    <li>@Html.ActionLink("Blog", "Blog", "Home", null, new { id = "link-blog", target = "_blank" })</li>
+                    <li>@Html.ActionLink("Tools", "Index", "Tools", null, new { id = "link-tools" })</li>
+                    <li>@Html.ActionLink("About", "About", "Home", null, new { id = "link-about" })</li>
+                </ul>
+                @if (User.Identity.IsAuthenticated || Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes().Any())
+                {
+                    @Html.Partial("_LoginPartial")
+                }
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; Martin Costello 2014-@DateTime.UtcNow.Year | <a href="http://status.martincostello.com/" target="_blank">Site Status &amp; Uptime</a> | Sponsored by <a href="https://www.browserstack.com/"><img src="@Url.Content("~/Content/browserstack.svg")" viewBox="0 0 428.5 92.3" height="20" alt="Sponsored by BrowserStack." title="Sponsored by BrowserStack." /></a></p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    @if (Request.IsLocal)
+    {
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+    </script>
+    }
+    else
+    {
+    <script type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-42907618-1']);
+        _gaq.push(['_setDomainName', '@Request.Url.Host']);
+        _gaq.push(['_trackPageview']);
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script>
+    }
+</body>
+@if (!string.IsNullOrEmpty(MvcApplication.BuildLabel) && !string.IsNullOrEmpty(MvcApplication.BuildTimestamp))
+{
+<!--
+    Build Label:     @MvcApplication.BuildLabel
+    Build Timestamp: @MvcApplication.BuildTimestamp
+    Datacenter:      @ConfigurationManager.AppSettings["Azure:Datacenter"]
+    Instance:        @Environment.MachineName
+-->
+}
+</html>

@@ -1,0 +1,58 @@
+﻿@model GenerateHashModel
+<form class="form-horizontal" id="form-generate-hash" role="form">
+    <fieldset>
+        <legend>Hash Generator</legend>
+        <a name="GenerateHash"></a>
+        <div class="form-group">
+            @Html.LabelFor((m) => m.HashName, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.DropDownListFor(
+                    (m) => m.HashName,
+                    new SelectList(this.Model.HashTypes, "Value", "Text", this.Model.Format),
+                    "-- Select hash type --",
+                    new { @class = "form-control", id = "dropdown-hash-name" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor((m) => m.Format, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.DropDownListFor(
+                    (m) => m.Format,
+                    new SelectList(Enum.GetValues(typeof(HashFormat))),
+                    "-- Select format --",
+                    new { @class = "form-control", id = "dropdown-hash-format" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor((m) => m.Plaintext, new { @class = "control-label col-md-2" })
+            <div class="col-md-7">
+                @Html.TextAreaFor((m) => m.Plaintext, new { @class = "form-control", id = "textarea-plaintext", placeholder = "Enter text to hash", rows = 4, spellcheck = "false" })
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-6">
+                <a id="button-generate-hash" class="btn btn-primary" href="#GenerateHash" role="button" rel="nofollow" onclick="_gaq.push(['_trackEvent', 'generate-hash', 'clicked'])">Generate Hash</a>
+            </div>
+        </div>
+        <div id="div-hash" class="form-group hidden">
+            <label for="pre-hash" class="control-label col-md-2">Hash</label>
+            <div class="col-md-7">
+                @if (this.Request.Browser.IsMobileDevice)
+                {
+                @Html.TextBox("text-hash", string.Empty, new { @class = "form-control code", id = "text-hash", disabled = string.Empty })
+                }
+                else
+                {
+                <div class="input-group">
+                    @Html.TextBox("text-hash", string.Empty, new { @class = "form-control code", id = "text-hash", disabled = string.Empty })
+                    <span class="input-group-btn">
+                        <button id="button-copy-hash" class="btn btn-default copy-button" data-clipboard-target="text-hash" title="Copy to clipboard">
+                            <span class="glyphicon glyphicon-save"></span>
+                        </button>
+                    </span>
+                </div>
+                }
+            </div>
+        </div>
+    </fieldset>
+</form>

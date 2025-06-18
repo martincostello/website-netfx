@@ -1,0 +1,93 @@
+﻿@model ManageLoginsViewModel
+@using Microsoft.Owin.Security
+@{
+    ViewBag.Title = "Manage your external logins";
+    ViewBag.MetaDescription = string.Empty;
+    ViewBag.MetaRobots = "NOINDEX";
+}
+<h2>@ViewBag.Title</h2>
+<p class="text-success">@ViewBag.StatusMessage</p>
+@{
+    Dictionary<string, string> iconMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "GitHub", "github" },
+        { "Google", "google" },
+        { "Microsoft", "windows" },
+        { "Twitter", "twitter" },
+    };
+    
+    var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+    
+    if (!loginProviders.Any())
+    {
+        <div>
+            <p>No third-party authentication services are available at this time.</p>
+        </div>
+    }
+    else
+    {
+        if (Model.CurrentLogins.Count > 0)
+        {
+            <h4>Registered Logins</h4>
+            <table class="table">
+                <tbody>
+                    @foreach (var account in Model.CurrentLogins)
+                    {
+                        <tr>
+                            <td>
+                                @if (ViewBag.ShowRemoveButton)
+                                {
+                                    @account.LoginProvider
+                                }
+                                else
+                                {
+                                    <a class="btn btn-block btn-social btn-@account.LoginProvider.ToLowerInvariant()" href="#">
+                                        <i class="fa fa-@iconMap[account.LoginProvider]"></i> @account.LoginProvider
+                                    </a>
+                                }
+                            </td>
+                            <td>
+                                @if (ViewBag.ShowRemoveButton)
+                                {
+                                    using (Html.BeginForm("RemoveLogin", "Manage"))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <div>
+                                            @Html.Hidden("loginProvider", account.LoginProvider)
+                                            @Html.Hidden("providerKey", account.ProviderKey)
+                                            <button type="submit" class="btn btn-block btn-social btn-@account.LoginProvider.ToLowerInvariant()" value="Remove" title="Remove this @account.LoginProvider login from your account.">
+                                                <i class="fa fa-@iconMap[account.LoginProvider]"></i> Remove this @account.LoginProvider login from your account.
+                                            </button>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    @: &nbsp;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        if (Model.OtherLogins.Count > 0)
+        {
+            using (Html.BeginForm("LinkLogin", "Manage"))
+            {
+                <h4>Other Logins</h4>
+                @Html.AntiForgeryToken()
+                <div id="socialLoginList">
+                    <p>
+                        @foreach (AuthenticationDescription p in Model.OtherLogins.OrderBy((p) => p.Caption))
+                        {
+                            <button type="submit" class="btn btn-block btn-social btn-@p.AuthenticationType.ToLowerInvariant()" id="@p.AuthenticationType" name="provider" value="@p.AuthenticationType" title="Log in using your @p.Caption account">
+                                <i class="fa fa-@iconMap[p.AuthenticationType]"></i> Log in using your @p.Caption account
+                            </button>
+                        }
+                    </p>
+                </div>
+            }
+        }
+    }
+}

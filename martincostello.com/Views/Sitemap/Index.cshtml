@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Site Map";
+    ViewBag.MetaDescription = "Site Map for martincostello.com.";
+}
+<h1>Sitemap for martincostello.com</h1>
+<div class="container">
+    <ul>
+        <li>@Html.ActionLink("About", "About", "Home")</li>
+        <li>@Html.ActionLink("Home", "Index", "Home")</li>
+        <li>@Html.ActionLink("Projects", "Index", "Projects")</li>
+        <li>@Html.ActionLink("Tools", "Index", "Tools")</li>
+    </ul>
+</div>
